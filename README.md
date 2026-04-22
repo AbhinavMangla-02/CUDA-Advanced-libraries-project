@@ -21,28 +21,7 @@ Every thread handles **one pixel of one image**. With a batch of 1000 images at 
 
 ---
 
-## Project Structure
 
-```
-cuda-batch-edge-detection/
-├── src/
-│   ├── main.cu            ← benchmark driver (all modes)
-│   ├── gpu_edge.cu        ← CUDA kernels (naive + shared-mem)
-│   ├── gpu_edge.cuh       ← GPU public API
-│   ├── cpu_edge.cpp       ← single-thread CPU baseline
-│   ├── cpu_edge.h
-│   ├── image_utils.cpp    ← PGM binary image I/O (no external deps)
-│   └── image_utils.h
-├── scripts/
-│   ├── generate_images.py ← create synthetic test images
-│   ├── run_benchmark.sh   ← end-to-end pipeline
-│   └── plot_results.py    ← matplotlib benchmark plots
-├── samples/               ← example input/output images
-├── input_images/          ← populated by generate_images.py
-├── output_edges/          ← populated at runtime
-├── results/               ← benchmark CSVs + plots
-└── Makefile
-```
 
 ---
 
@@ -139,27 +118,6 @@ GPU wall time = 78 ms
 
 ---
 
-## Sample Output
-
-Input images (512×512 grayscale) and their Sobel edge maps:
-
-### Geometric shapes
-![Geometric shapes](samples/geometric_shapes_comparison.png)
-
-### Sinusoidal gradient
-![Sinusoidal wave](samples/sinusoidal_wave_comparison.png)
-
-### Checkerboard
-![Checkerboard](samples/checkerboard_comparison.png)
-
-### Line drawing
-![Line drawing](samples/line_drawing_comparison.png)
-
-### Benchmark results
-![Benchmark chart](samples/benchmark_results_chart.png)
-
-![Resolution scaling](samples/resolution_scaling_chart.png)
-
 ---
 
 ## CUDA Design Decisions
@@ -205,33 +163,7 @@ All N images are packed into one contiguous device allocation. A single `cudaMem
 
 ---
 
-## Image Format
 
-Images are stored in **PGM binary (P5)** format — a trivial, header-only grayscale format with zero external dependencies:
-
-```
-P5
-<width> <height>
-255
-<width×height bytes of pixel data>
-```
-
-You can convert any JPEG/PNG to PGM with ImageMagick:
-```bash
-convert photo.jpg -colorspace Gray photo.pgm
-```
-
----
-
-## Extending the Project
-
-| Idea | Where to add |
-|---|---|
-| Canny edge detection | `gpu_edge.cu` — chain Gaussian blur → Sobel → NMS |
-| CUDA streams (overlap transfer + compute) | `gpu_edge.cu` — split batch across 2–4 streams |
-| Multi-GPU | `main.cu` — `cudaSetDevice()` + divide batch |
-| PNG/JPEG I/O | Replace `image_utils.cpp` with stb_image |
-| Texture memory | Replace `d_input` reads with `cudaTextureObject_t` |
 
 ---
 
