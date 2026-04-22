@@ -163,10 +163,3 @@ All N images are packed into one contiguous device allocation. A single `cudaMem
 
 ---
 
-
-
----
-
-## Author
-
-GPU Programming Course — Capstone Project
